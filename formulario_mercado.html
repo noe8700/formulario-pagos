@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Compras de Mercado</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul:     #1F4E79;
+    --azul-m:   #2E75B6;
+    --azul-c:   #D6E4F0;
+    --verde:    #375623;
+    --verde-c:  #E2EFDA;
+    --rojo:     #C00000;
+    --naranja:  #E65100;
+    --amarillo: #FFF2CC;
+    --gris:     #F0F4F8;
+    --gris-b:   #E2E8F0;
+    --texto:    #1a1a2e;
+    --blanco:   #FFFFFF;
+    --sombra:   0 4px 24px rgba(31,78,121,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--gris); color: var(--texto); min-height: 100vh; padding-bottom: 60px; }
+
+  header { background: var(--verde); padding: 28px 24px 32px; text-align: center; position: relative; overflow: hidden; }
+  header::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; background:rgba(255,255,255,0.05); border-radius:50%; }
+  header h1 { font-family:'Fraunces',serif; font-size:24px; color:var(--blanco); position:relative; z-index:1; }
+  header p { font-size:13px; color:rgba(255,255,255,0.7); margin-top:6px; position:relative; z-index:1; }
+  .header-badge { display:inline-block; background:rgba(255,255,255,0.15); color:white; font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; padding:4px 14px; border-radius:20px; margin-bottom:10px; position:relative; z-index:1; }
+
+  .container { max-width: 600px; margin: 0 auto; padding: 20px 14px; }
+
+  .section { background:var(--blanco); border-radius:18px; padding:20px 18px; box-shadow:var(--sombra); margin-bottom:14px; }
+  .section-title { font-size:11px; font-weight:700; color:var(--verde); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--gris-b); }
+
+  .field { margin-bottom:14px; }
+  .field:last-child { margin-bottom:0; }
+  .field label { display:block; font-size:12px; font-weight:600; color:#4a5568; margin-bottom:5px; }
+  .field label .req { color:var(--rojo); margin-left:2px; }
+
+  input[type="text"], input[type="number"], input[type="date"], select, textarea {
+    width:100%; padding:11px 13px; border:1.5px solid var(--gris-b); border-radius:11px;
+    font-family:'DM Sans',sans-serif; font-size:14px; color:var(--texto);
+    background:var(--gris); transition:all 0.2s; appearance:none; -webkit-appearance:none;
+  }
+  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--verde); background:var(--blanco); box-shadow:0 0 0 3px rgba(55,86,35,0.12); }
+  select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5568' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:34px; }
+
+  /* Toggle C/F S/F */
+  .toggle-group { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .toggle-btn { padding:11px; border:2px solid var(--gris-b); border-radius:11px; background:var(--gris); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:#718096; cursor:pointer; text-align:center; transition:all 0.2s; }
+  .toggle-btn.active-cf { border-color:var(--verde); background:var(--verde-c); color:var(--verde); }
+  .toggle-btn.active-sf { border-color:var(--rojo); background:#fff0f0; color:var(--rojo); }
+
+  .factura-field { overflow:hidden; max-height:0; opacity:0; transition:all 0.3s; margin-top:0; }
+  .factura-field.visible { max-height:100px; opacity:1; margin-top:14px; }
+
+  /* Productos */
+  .productos-container { display:flex; flex-direction:column; gap:12px; }
+
+  .producto-card {
+    background: var(--gris);
+    border: 1.5px solid var(--gris-b);
+    border-radius: 14px;
+    padding: 14px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .producto-card:focus-within { border-color: var(--verde); }
+
+  .producto-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .producto-num { font-size:11px; font-weight:700; color:var(--verde); text-transform:uppercase; letter-spacing:0.8px; }
+  .btn-remove-prod { background:#fee2e2; color:var(--rojo); border:none; border-radius:8px; width:28px; height:28px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+  .btn-remove-prod:hover { background:var(--rojo); color:white; }
+
+  .prod-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+  .prod-grid .full { grid-column:1/-1; }
+  .prod-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px; }
+
+  .prod-field label { font-size:11px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px; }
+  .prod-field input, .prod-field select { font-size:13px; padding:9px 11px; border-radius:9px; }
+
+  .subtotal-prod { background:var(--verde-c); border-radius:9px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:13px; }
+  .subtotal-prod .label { color:var(--verde); font-weight:500; }
+  .subtotal-prod .valor { font-weight:700; color:var(--verde); font-size:15px; }
+
+  .btn-add-prod { width:100%; background:transparent; border:2px dashed var(--verde); border-radius:14px; padding:14px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; color:var(--verde); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:12px; }
+  .btn-add-prod:hover { background:var(--verde-c); border-style:solid; }
+
+  /* Total */
+  .total-box { background:linear-gradient(135deg, var(--verde) 0%, #4a7c2f 100%); border-radius:16px; padding:20px 22px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; box-shadow:0 6px 20px rgba(55,86,35,0.25); }
+  .total-box .label { font-size:13px; color:rgba(255,255,255,0.8); font-weight:500; }
+  .total-box .monto { font-family:'Fraunces',serif; font-size:30px; color:var(--blanco); font-weight:700; }
+  .total-box .monto span { font-size:16px; opacity:0.8; margin-right:4px; }
+
+  /* Resumen */
+  .resumen-box { background:var(--blanco); border-radius:16px; padding:18px; box-shadow:var(--sombra); margin-bottom:14px; }
+  .resumen-row { display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:1px solid var(--gris-b); }
+  .resumen-row:last-child { border-bottom:none; padding-top:10px; }
+  .resumen-row .key { color:#718096; }
+  .resumen-row .val { font-weight:600; }
+
+  .btn-enviar { width:100%; background:var(--verde); color:var(--blanco); border:none; border-radius:16px; padding:18px; font-family:'DM Sans',sans-serif; font-size:17px; font-weight:700; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 6px 20px rgba(55,86,35,0.3); }
+  .btn-enviar:hover { opacity:0.92; transform:translateY(-2px); }
+  .btn-enviar:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+  .config-url { background:var(--amarillo); border-radius:14px; padding:14px 16px; margin-bottom:14px; border:1.5px solid #f0d060; }
+  .config-url label { font-size:11px; font-weight:700; color:#7a6000; text-transform:uppercase; letter-spacing:0.8px; display:block; margin-bottom:6px; }
+  .config-url input { background:rgba(255,255,255,0.7); border-color:#e8c840; font-size:12px; padding:8px 12px; }
+  .config-url small { font-size:11px; color:#9a8000; display:block; margin-top:5px; }
+
+  /* Éxito */
+  .success-screen { display:none; text-align:center; padding:40px 20px; }
+  .success-icon { font-size:72px; margin-bottom:16px; animation:popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+  @keyframes popIn { from{transform:scale(0);opacity:0;} to{transform:scale(1);opacity:1;} }
+  .success-screen h2 { font-family:'Fraunces',serif; font-size:26px; color:var(--verde); margin-bottom:8px; }
+  .success-screen p { font-size:14px; color:#718096; margin-bottom:6px; }
+  .success-detail { background:var(--verde-c); border-radius:14px; padding:16px; margin:16px 0; text-align:left; font-size:13px; }
+  .btn-nueva { background:var(--verde); color:white; border:none; border-radius:14px; padding:14px 32px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600; cursor:pointer; margin-top:16px; box-shadow:0 4px 16px rgba(55,86,35,0.25); }
+
+  .loading-overlay { display:none; position:fixed; inset:0; background:rgba(55,86,35,0.6); backdrop-filter:blur(4px); z-index:100; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+  .loading-overlay.show { display:flex; }
+  .spinner { width:50px; height:50px; border:4px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.8s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg);} }
+  .loading-overlay p { color:white; font-size:15px; font-weight:500; }
+
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--rojo); color:white; padding:14px 24px; border-radius:14px; font-size:14px; font-weight:500; box-shadow:0 8px 32px rgba(0,0,0,0.2); opacity:0; transition:all 0.3s; z-index:200; min-width:260px; text-align:center; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <p>Registrando compra...</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<header>
+  <div class="header-badge">🛒 Compras de Mercado</div>
+  <h1>Registro de Compra</h1>
+  <p>Registrá los productos comprados en el mercado</p>
+</header>
+
+<div class="container">
+
+  <div class="config-url" id="configUrl">
+    <label>⚙️ URL Web App Google Sheets</label>
+    <input type="url" id="sheetsUrl" placeholder="https://script.google.com/macros/s/.../exec">
+    <small>Ingresá la URL una sola vez — queda guardada en el dispositivo.</small>
+  </div>
+
+  <div id="formContainer">
+
+    <!-- Identificación -->
+    <div class="section">
+      <div class="section-title">📍 Identificación</div>
+
+      <div class="field">
+        <label>Fecha de Compra <span class="req">*</span></label>
+        <input type="date" id="fecha">
+      </div>
+
+      <div class="field">
+        <label>Local <span class="req">*</span></label>
+        <select id="local">
+          <option value="">— Seleccioná el local —</option>
+          <option>Tota</option>
+          <option>Puerto Milanesa</option>
+          <option>La Juntada</option>
+          <option>Centro de Producción</option>
+          <option>Empanizados SRL</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Tipo de Comprobante <span class="req">*</span></label>
+        <div class="toggle-group">
+          <button type="button" class="toggle-btn" id="btnCF" onclick="setTipo('C/F')">✅ C/F — Con Factura</button>
+          <button type="button" class="toggle-btn" id="btnSF" onclick="setTipo('S/F')">📄 S/F — Sin Factura</button>
+        </div>
+        <input type="hidden" id="tipoComp" value="">
+      </div>
+
+      <div class="factura-field" id="facturaField">
+        <div class="field" style="margin-bottom:0;">
+          <label>N° de Factura / Ticket</label>
+          <input type="text" id="nfactura" placeholder="Ej: 0001-00012345">
+        </div>
+      </div>
+    </div>
+
+    <!-- Proveedor / Mercado -->
+    <div class="section">
+      <div class="section-title">🏪 Lugar de Compra</div>
+      <div class="field">
+        <label>Nombre del Mercado / Proveedor <span class="req">*</span></label>
+        <input type="text" id="proveedor" placeholder="Ej: Mercado Central, Verdulería Juan, etc.">
+      </div>
+      <div class="field">
+        <label>NIT / CUIT (si tiene)</label>
+        <input type="text" id="cuit" placeholder="Opcional">
+      </div>
+    </div>
+
+    <!-- Productos -->
+    <div class="section">
+      <div class="section-title">🛒 Productos Comprados</div>
+      <div class="productos-container" id="productosContainer"></div>
+      <button type="button" class="btn-add-prod" onclick="agregarProducto()">
+        ＋ Agregar producto
+      </button>
+    </div>
+
+    <!-- Resumen -->
+    <div class="resumen-box">
+      <div class="resumen-row"><span class="key">Cantidad de productos</span><span class="val" id="resCantidad">0</span></div>
+      <div class="resumen-row"><span class="key" style="font-weight:700; font-size:15px;">TOTAL COMPRA</span><span class="val" id="resTotalTexto" style="font-size:17px; color:var(--verde);">$0,00</span></div>
+    </div>
+
+    <div class="total-box">
+      <div>
+        <div class="label">Total de la Compra</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.6); margin-top:2px;">Suma de todos los productos</div>
+      </div>
+      <div class="monto"><span>$</span><span id="totalMonto">0,00</span></div>
+    </div>
+
+    <button class="btn-enviar" onclick="enviarCompra()">🛒 Registrar Compra</button>
+
+  </div>
+
+  <!-- Éxito -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✅</div>
+    <h2>¡Compra Registrada!</h2>
+    <p>Los productos fueron guardados correctamente.</p>
+    <p style="font-size:12px;color:#aaa;">Los datos alimentan el control de fluctuación de precios automáticamente.</p>
+    <div class="success-detail" id="successDetail"></div>
+    <button class="btn-nueva" onclick="nuevaCompra()">+ Nueva Compra</button>
+  </div>
+
+</div>
+
+<script>
+// ── Config ──────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  const url = localStorage.getItem('mercado_sheetsUrl');
+  if (url) { document.getElementById('sheetsUrl').value = url; document.getElementById('configUrl').style.display='none'; }
+  document.getElementById('sheetsUrl').addEventListener('change', e => {
+    if (e.target.value) { localStorage.setItem('mercado_sheetsUrl', e.target.value); document.getElementById('configUrl').style.display='none'; }
+  });
+  // Fecha de hoy por defecto
+  document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+  agregarProducto();
+});
+
+// ── Tipo comprobante ────────────────────────────────────────
+var tipoSeleccionado = '';
+function setTipo(t) {
+  tipoSeleccionado = t;
+  document.getElementById('tipoComp').value = t;
+  document.getElementById('btnCF').className = 'toggle-btn' + (t==='C/F'?' active-cf':'');
+  document.getElementById('btnSF').className = 'toggle-btn' + (t==='S/F'?' active-sf':'');
+  document.getElementById('facturaField').className = 'factura-field' + (t==='C/F'?' visible':'');
+  if (t==='S/F') document.getElementById('nfactura').value='';
+}
+
+// ── Productos dinámicos ─────────────────────────────────────
+var prodCount = 0;
+var CATS = [
+  "Materias Primas - Verduras/Frutas",
+  "Materias Primas - Lácteos/Huevos",
+  "Materias Primas - Abarrotes/Condimentos/Salsas",
+  "Materias Primas - Quesos",
+  "Materias Primas - Carnes",
+  "Materias Primas - Embutidos",
+  "Materias Primas - Harinas/Panes",
+  "Artículos de Limpieza",
+  "Descartables",
+  "Material de Escritorio",
+  "Reposición de Materiales"
+];
+
+function agregarProducto() {
+  prodCount++;
+  var id = prodCount;
+  var cont = document.getElementById('productosContainer');
+  var catOptions = CATS.map(function(c){ return '<option>'+c+'</option>'; }).join('');
+
+  var card = document.createElement('div');
+  card.className = 'producto-card';
+  card.id = 'prod_'+id;
+  card.innerHTML = `
+    <div class="producto-header">
+      <span class="producto-num">Producto #${id}</span>
+      ${id > 1 ? '<button class="btn-remove-prod" onclick="eliminarProducto('+id+')">✕</button>' : '<span></span>'}
+    </div>
+    <div class="prod-grid">
+      <div class="prod-field full">
+        <label>Nombre del Producto <span class="req">*</span></label>
+        <input type="text" id="pnombre_${id}" placeholder="Ej: Tomate perita, Leche entera..." oninput="recalcularTodo()">
+      </div>
+      <div class="prod-field">
+        <label>Categoría <span class="req">*</span></label>
+        <select id="pcat_${id}">
+          <option value="">— Categoría —</option>
+          ${catOptions}
+        </select>
+      </div>
+      <div class="prod-field">
+        <label>Unidad <span class="req">*</span></label>
+        <select id="punidad_${id}">
+          <option value="">—</option>
+          <option>kg</option>
+          <option>lts</option>
+          <option>und</option>
+          <option>paq</option>
+          <option>caja</option>
+          <option>docena</option>
+          <option>metros</option>
+          <option>otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="prod-grid-3">
+      <div class="prod-field">
+        <label>Cantidad <span class="req">*</span></label>
+        <input type="number" id="pcant_${id}" placeholder="0" min="0" step="any" oninput="calcSubtotal(${id})">
+      </div>
+      <div class="prod-field">
+        <label>P. Unitario ($) <span class="req">*</span></label>
+        <input type="number" id="pprecio_${id}" placeholder="0.00" min="0" step="0.01" oninput="calcSubtotal(${id})">
+      </div>
+      <div class="prod-field">
+        <label>Desc. ($)</label>
+        <input type="number" id="pdesc_${id}" placeholder="0.00" min="0" step="0.01" oninput="calcSubtotal(${id})">
+      </div>
+    </div>
+    <div class="subtotal-prod">
+      <span class="label">Subtotal</span>
+      <span class="valor" id="psubtotal_${id}">$0,00</span>
+    </div>
+  `;
+  cont.appendChild(card);
+  card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function eliminarProducto(id) {
+  var card = document.getElementById('prod_'+id);
+  if (card) { card.remove(); recalcularTodo(); }
+}
+
+function calcSubtotal(id) {
+  var cant   = parseFloat(document.getElementById('pcant_'+id).value)   || 0;
+  var precio = parseFloat(document.getElementById('pprecio_'+id).value) || 0;
+  var desc   = parseFloat(document.getElementById('pdesc_'+id).value)   || 0;
+  var sub    = Math.max(0, cant * precio - desc);
+  document.getElementById('psubtotal_'+id).textContent = '$' + sub.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  recalcularTodo();
+  return sub;
+}
+
+function recalcularTodo() {
+  var cards = document.querySelectorAll('.producto-card');
+  var total = 0;
+  var cant  = 0;
+  cards.forEach(function(card) {
+    var id     = card.id.replace('prod_','');
+    var c      = parseFloat(document.getElementById('pcant_'+id) && document.getElementById('pcant_'+id).value) || 0;
+    var p      = parseFloat(document.getElementById('pprecio_'+id) && document.getElementById('pprecio_'+id).value) || 0;
+    var d      = parseFloat(document.getElementById('pdesc_'+id) && document.getElementById('pdesc_'+id).value) || 0;
+    var sub    = Math.max(0, c * p - d);
+    total += sub;
+    if (document.getElementById('psubtotal_'+id)) {
+      document.getElementById('psubtotal_'+id).textContent = '$'+sub.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    }
+    if (document.getElementById('pnombre_'+id) && document.getElementById('pnombre_'+id).value.trim()) cant++;
+  });
+  document.getElementById('resCantidad').textContent = cant;
+  document.getElementById('resTotalTexto').textContent = '$'+total.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('totalMonto').textContent = total.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return total;
+}
+
+function recolectarProductos() {
+  var cards = document.querySelectorAll('.producto-card');
+  var productos = [];
+  cards.forEach(function(card) {
+    var id     = card.id.replace('prod_','');
+    var nombre = document.getElementById('pnombre_'+id).value.trim();
+    if (!nombre) return;
+    var cant   = parseFloat(document.getElementById('pcant_'+id).value)   || 0;
+    var precio = parseFloat(document.getElementById('pprecio_'+id).value) || 0;
+    var desc   = parseFloat(document.getElementById('pdesc_'+id).value)   || 0;
+    var cat    = document.getElementById('pcat_'+id).value;
+    var unidad = document.getElementById('punidad_'+id).value;
+    var sub    = Math.max(0, cant * precio - desc);
+    productos.push({ nombre, categoria:cat, unidad, cantidad:cant, precio_unit:precio, desc_monto:desc, subtotal:sub });
+  });
+  return productos;
+}
+
+// ── Validar ─────────────────────────────────────────────────
+function validar() {
+  if (!document.getElementById('fecha').value)           { showToast('⚠️ Ingresá la fecha de compra'); return false; }
+  if (!document.getElementById('local').value)           { showToast('⚠️ Seleccioná el local'); return false; }
+  if (!tipoSeleccionado)                                  { showToast('⚠️ Seleccioná el tipo de comprobante'); return false; }
+  if (!document.getElementById('proveedor').value.trim()){ showToast('⚠️ Ingresá el nombre del mercado/proveedor'); return false; }
+  var prods = recolectarProductos();
+  if (prods.length === 0) { showToast('⚠️ Ingresá al menos un producto'); return false; }
+  for (var i=0; i<prods.length; i++) {
+    if (!prods[i].categoria) { showToast('⚠️ Seleccioná la categoría del producto #'+(i+1)); return false; }
+    if (!prods[i].unidad)    { showToast('⚠️ Seleccioná la unidad del producto #'+(i+1)); return false; }
+    if (prods[i].cantidad <= 0) { showToast('⚠️ Ingresá la cantidad del producto #'+(i+1)); return false; }
+    if (prods[i].precio_unit <= 0) { showToast('⚠️ Ingresá el precio del producto #'+(i+1)); return false; }
+  }
+  return true;
+}
+
+// ── Enviar ──────────────────────────────────────────────────
+async function enviarCompra() {
+  if (!validar()) return;
+
+  var sheetsUrl = localStorage.getItem('mercado_sheetsUrl') || document.getElementById('sheetsUrl').value.trim();
+  if (!sheetsUrl) { document.getElementById('configUrl').style.display='block'; showToast('⚠️ Ingresá la URL del Web App'); return; }
+
+  var total    = recalcularTodo();
+  var productos = recolectarProductos();
+
+  // Formatear fecha de YYYY-MM-DD a DD/MM/YYYY
+  var fechaRaw = document.getElementById('fecha').value;
+  var partes   = fechaRaw.split('-');
+  var fecha    = partes[2]+'/'+partes[1]+'/'+partes[0];
+
+  var payload = {
+    action:    'comprasMercado',
+    fecha,
+    local:     document.getElementById('local').value,
+    tipo:      tipoSeleccionado,
+    nfactura:  document.getElementById('nfactura').value.trim(),
+    proveedor: document.getElementById('proveedor').value.trim(),
+    cuit:      document.getElementById('cuit').value.trim(),
+    productos,
+    total
+  };
+
+  document.getElementById('loadingOverlay').classList.add('show');
+
+  try {
+    var jsonStr = JSON.stringify(payload);
+    await fetch(sheetsUrl + '?data=' + encodeURIComponent(jsonStr), { method:'GET', mode:'no-cors' });
+    document.getElementById('loadingOverlay').classList.remove('show');
+    mostrarExito(payload);
+  } catch(err) {
+    document.getElementById('loadingOverlay').classList.remove('show');
+    showToast('❌ Error: '+err.message);
+  }
+}
+
+// ── Éxito ───────────────────────────────────────────────────
+function mostrarExito(d) {
+  document.getElementById('formContainer').style.display='none';
+  document.getElementById('successScreen').style.display='block';
+
+  var prodsHtml = d.productos.map(function(p,i){
+    return '<div style="padding:5px 0; border-bottom:1px solid rgba(55,86,35,0.1);">'+
+      '<b>'+(i+1)+'. '+p.nombre+'</b><br>'+
+      '<span style="color:#555;font-size:12px;">'+p.cantidad+' '+p.unidad+' × $'+p.precio_unit.toLocaleString('es-AR')+
+      (p.desc_monto>0?' — Desc: $'+p.desc_monto.toLocaleString('es-AR'):'')+
+      ' = <b>$'+p.subtotal.toLocaleString('es-AR',{minimumFractionDigits:2})+'</b></span></div>';
+  }).join('');
+
+  document.getElementById('successDetail').innerHTML =
+    '<b style="color:var(--verde);">'+d.proveedor+'</b> · '+d.local+' · '+d.fecha+'<br><br>'+
+    prodsHtml+
+    '<div style="padding:8px 0;font-size:16px;font-weight:700;color:var(--verde);">Total: $'+d.total.toLocaleString('es-AR',{minimumFractionDigits:2})+'</div>';
+}
+
+function nuevaCompra() {
+  document.getElementById('successScreen').style.display='none';
+  document.getElementById('formContainer').style.display='block';
+  document.getElementById('productosContainer').innerHTML='';
+  prodCount=0;
+  ['proveedor','cuit','nfactura'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('local').selectedIndex=0;
+  document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+  tipoSeleccionado='';
+  document.getElementById('btnCF').className='toggle-btn';
+  document.getElementById('btnSF').className='toggle-btn';
+  document.getElementById('facturaField').className='factura-field';
+  recalcularTodo();
+  agregarProducto();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showToast(msg) {
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); },3500);
+}
+</script>
+</body>
+</html>
