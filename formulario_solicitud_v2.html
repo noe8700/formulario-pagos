@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Compras de Mercado</title>
+<title>Solicitud de Pago</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -24,7 +24,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--gris); color: var(--texto); min-height: 100vh; padding-bottom: 60px; }
 
-  header { background: var(--verde); padding: 28px 24px 32px; text-align: center; position: relative; overflow: hidden; }
+  header { background: var(--azul); padding: 28px 24px 32px; text-align: center; position: relative; overflow: hidden; }
   header::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; background:rgba(255,255,255,0.05); border-radius:50%; }
   header h1 { font-family:'Fraunces',serif; font-size:24px; color:var(--blanco); position:relative; z-index:1; }
   header p { font-size:13px; color:rgba(255,255,255,0.7); margin-top:6px; position:relative; z-index:1; }
@@ -33,7 +33,7 @@
   .container { max-width: 600px; margin: 0 auto; padding: 20px 14px; }
 
   .section { background:var(--blanco); border-radius:18px; padding:20px 18px; box-shadow:var(--sombra); margin-bottom:14px; }
-  .section-title { font-size:11px; font-weight:700; color:var(--verde); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+  .section-title { font-size:11px; font-weight:700; color:var(--azul-m); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
   .section-title::after { content:''; flex:1; height:1px; background:var(--gris-b); }
 
   .field { margin-bottom:14px; }
@@ -41,24 +41,26 @@
   .field label { display:block; font-size:12px; font-weight:600; color:#4a5568; margin-bottom:5px; }
   .field label .req { color:var(--rojo); margin-left:2px; }
 
-  input[type="text"], input[type="number"], input[type="date"], select, textarea {
+  input[type="text"], input[type="number"], select, textarea {
     width:100%; padding:11px 13px; border:1.5px solid var(--gris-b); border-radius:11px;
     font-family:'DM Sans',sans-serif; font-size:14px; color:var(--texto);
     background:var(--gris); transition:all 0.2s; appearance:none; -webkit-appearance:none;
   }
-  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--verde); background:var(--blanco); box-shadow:0 0 0 3px rgba(55,86,35,0.12); }
+  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--azul-m); background:var(--blanco); box-shadow:0 0 0 3px rgba(46,117,182,0.12); }
   select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234a5568' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:34px; }
+
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
   /* Toggle C/F S/F */
   .toggle-group { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .toggle-btn { padding:11px; border:2px solid var(--gris-b); border-radius:11px; background:var(--gris); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:#718096; cursor:pointer; text-align:center; transition:all 0.2s; }
-  .toggle-btn.active-cf { border-color:var(--verde); background:var(--verde-c); color:var(--verde); }
+  .toggle-btn.active-cf { border-color:var(--azul); background:var(--azul-c); color:var(--azul); }
   .toggle-btn.active-sf { border-color:var(--rojo); background:#fff0f0; color:var(--rojo); }
 
-  .factura-field { overflow:hidden; max-height:0; opacity:0; transition:all 0.3s; margin-top:0; }
+  .factura-field { overflow:hidden; max-height:0; opacity:0; transition:max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease; margin-top:0; }
   .factura-field.visible { max-height:100px; opacity:1; margin-top:14px; }
 
-  /* Productos */
+  /* ── Productos ── */
   .productos-container { display:flex; flex-direction:column; gap:12px; }
 
   .producto-card {
@@ -69,39 +71,100 @@
     position: relative;
     transition: border-color 0.2s;
   }
-  .producto-card:focus-within { border-color: var(--verde); }
+  .producto-card:focus-within { border-color: var(--azul-m); }
 
-  .producto-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-  .producto-num { font-size:11px; font-weight:700; color:var(--verde); text-transform:uppercase; letter-spacing:0.8px; }
-  .btn-remove-prod { background:#fee2e2; color:var(--rojo); border:none; border-radius:8px; width:28px; height:28px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
-  .btn-remove-prod:hover { background:var(--rojo); color:white; }
+  .producto-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .producto-num {
+    font-size: 11px; font-weight: 700; color: var(--azul-m);
+    text-transform: uppercase; letter-spacing: 0.8px;
+  }
+  .btn-remove-prod {
+    background: #fee2e2; color: var(--rojo);
+    border: none; border-radius: 8px;
+    width: 28px; height: 28px;
+    font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .btn-remove-prod:hover { background: var(--rojo); color: white; }
 
-  .prod-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
-  .prod-grid .full { grid-column:1/-1; }
-  .prod-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px; }
+  .prod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .prod-grid .full { grid-column: 1 / -1; }
+  .prod-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 
-  .prod-field label { font-size:11px; font-weight:600; color:#4a5568; display:block; margin-bottom:4px; }
-  .prod-field input, .prod-field select { font-size:13px; padding:9px 11px; border-radius:9px; }
+  .prod-field label { font-size: 11px; font-weight: 600; color: #4a5568; display: block; margin-bottom: 4px; }
+  .prod-field input, .prod-field select { font-size: 13px; padding: 9px 11px; border-radius: 9px; }
 
-  .subtotal-prod { background:var(--verde-c); border-radius:9px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; margin-top:8px; font-size:13px; }
-  .subtotal-prod .label { color:var(--verde); font-weight:500; }
-  .subtotal-prod .valor { font-weight:700; color:var(--verde); font-size:15px; }
+  /* Descuento por producto */
+  .desc-toggle {
+    font-size: 12px; color: var(--azul-m); font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    margin-top: 6px; user-select: none;
+  }
+  .desc-toggle::before { content: '+'; font-size: 14px; }
+  .desc-toggle.open::before { content: '−'; }
 
-  .btn-add-prod { width:100%; background:transparent; border:2px dashed var(--verde); border-radius:14px; padding:14px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; color:var(--verde); cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:12px; }
-  .btn-add-prod:hover { background:var(--verde-c); border-style:solid; }
+  .desc-box { overflow:hidden; max-height:0; opacity:0; transition:all 0.3s; }
+  .desc-box.visible { max-height:80px; opacity:1; margin-top:8px; }
 
-  /* Total */
-  .total-box { background:linear-gradient(135deg, var(--verde) 0%, #4a7c2f 100%); border-radius:16px; padding:20px 22px; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; box-shadow:0 6px 20px rgba(55,86,35,0.25); }
+  .subtotal-prod {
+    background: var(--azul-c);
+    border-radius: 9px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+  .subtotal-prod .label { color: var(--azul); font-weight: 500; }
+  .subtotal-prod .valor { font-weight: 700; color: var(--azul); font-size: 15px; }
+
+  .btn-add-prod {
+    width: 100%;
+    background: transparent;
+    border: 2px dashed var(--azul-m);
+    border-radius: 14px;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--azul-m);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-add-prod:hover { background: var(--azul-c); border-style: solid; }
+
+  /* Descuento global */
+  .desc-global-box {
+    background: #fffbeb;
+    border: 1.5px solid #f0d060;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .desc-global-title { font-size: 12px; font-weight: 700; color: #7a6000; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .desc-tipo-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .desc-tipo-btn { padding: 9px; border: 1.5px solid #e8c840; border-radius: 10px; background: white; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: #7a6000; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .desc-tipo-btn.active { background: #f0d060; border-color: #c8a000; }
+
+  /* Resumen total */
+  .resumen-box { background: var(--blanco); border-radius: 16px; padding: 18px; box-shadow: var(--sombra); margin-bottom: 14px; }
+  .resumen-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--gris-b); }
+  .resumen-row:last-child { border-bottom: none; padding-top: 10px; }
+  .resumen-row .key { color: #718096; }
+  .resumen-row .val { font-weight: 600; color: var(--texto); }
+
+  .total-box { background: linear-gradient(135deg, var(--azul) 0%, var(--azul-m) 100%); border-radius: 16px; padding: 20px 22px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; box-shadow: 0 6px 20px rgba(31,78,121,0.25); }
   .total-box .label { font-size:13px; color:rgba(255,255,255,0.8); font-weight:500; }
   .total-box .monto { font-family:'Fraunces',serif; font-size:30px; color:var(--blanco); font-weight:700; }
   .total-box .monto span { font-size:16px; opacity:0.8; margin-right:4px; }
-
-  /* Resumen */
-  .resumen-box { background:var(--blanco); border-radius:16px; padding:18px; box-shadow:var(--sombra); margin-bottom:14px; }
-  .resumen-row { display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:1px solid var(--gris-b); }
-  .resumen-row:last-child { border-bottom:none; padding-top:10px; }
-  .resumen-row .key { color:#718096; }
-  .resumen-row .val { font-weight:600; }
 
   .btn-enviar { width:100%; background:var(--verde); color:var(--blanco); border:none; border-radius:16px; padding:18px; font-family:'DM Sans',sans-serif; font-size:17px; font-weight:700; cursor:pointer; transition:all 0.25s; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 6px 20px rgba(55,86,35,0.3); }
   .btn-enviar:hover { opacity:0.92; transform:translateY(-2px); }
@@ -118,10 +181,9 @@
   @keyframes popIn { from{transform:scale(0);opacity:0;} to{transform:scale(1);opacity:1;} }
   .success-screen h2 { font-family:'Fraunces',serif; font-size:26px; color:var(--verde); margin-bottom:8px; }
   .success-screen p { font-size:14px; color:#718096; margin-bottom:6px; }
-  .success-detail { background:var(--verde-c); border-radius:14px; padding:16px; margin:16px 0; text-align:left; font-size:13px; }
-  .btn-nueva { background:var(--verde); color:white; border:none; border-radius:14px; padding:14px 32px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600; cursor:pointer; margin-top:16px; box-shadow:0 4px 16px rgba(55,86,35,0.25); }
+  .btn-nueva { background:var(--azul); color:white; border:none; border-radius:14px; padding:14px 32px; font-family:'DM Sans',sans-serif; font-size:15px; font-weight:600; cursor:pointer; margin-top:16px; box-shadow:0 4px 16px rgba(31,78,121,0.25); }
 
-  .loading-overlay { display:none; position:fixed; inset:0; background:rgba(55,86,35,0.6); backdrop-filter:blur(4px); z-index:100; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+  .loading-overlay { display:none; position:fixed; inset:0; background:rgba(31,78,121,0.6); backdrop-filter:blur(4px); z-index:100; align-items:center; justify-content:center; flex-direction:column; gap:16px; }
   .loading-overlay.show { display:flex; }
   .spinner { width:50px; height:50px; border:4px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.8s linear infinite; }
   @keyframes spin { to{transform:rotate(360deg);} }
@@ -135,14 +197,14 @@
 
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
-  <p>Registrando compra...</p>
+  <p>Enviando solicitud...</p>
 </div>
 <div class="toast" id="toast"></div>
 
 <header>
-  <div class="header-badge">🛒 Compras de Mercado</div>
-  <h1>Registro de Compra</h1>
-  <p>Registrá los productos comprados en el mercado</p>
+  <div class="header-badge">🏪 Gestión Gastronómica</div>
+  <h1>Solicitud de Pago</h1>
+  <p>Completá el formulario para solicitar la aprobación del pago</p>
 </header>
 
 <div class="container">
@@ -158,12 +220,6 @@
     <!-- Identificación -->
     <div class="section">
       <div class="section-title">📍 Identificación</div>
-
-      <div class="field">
-        <label>Fecha de Compra <span class="req">*</span></label>
-        <input type="date" id="fecha">
-      </div>
-
       <div class="field">
         <label>Local <span class="req">*</span></label>
         <select id="local">
@@ -175,7 +231,6 @@
           <option>Empanizados SRL</option>
         </select>
       </div>
-
       <div class="field">
         <label>Solicitante <span class="req">*</span></label>
         <input type="text" id="solicitante" placeholder="Nombre completo de quien realiza la solicitud">
@@ -189,63 +244,113 @@
         </div>
         <input type="hidden" id="tipoComp" value="">
       </div>
-
       <div class="factura-field" id="facturaField">
         <div class="field" style="margin-bottom:0;">
-          <label>N° de Factura / Ticket</label>
+          <label>N° de Factura <span class="req">*</span></label>
           <input type="text" id="nfactura" placeholder="Ej: 0001-00012345">
         </div>
       </div>
     </div>
 
-    <!-- Proveedor / Mercado -->
+    <!-- Proveedor -->
     <div class="section">
-      <div class="section-title">🏪 Lugar de Compra</div>
+      <div class="section-title">🏭 Proveedor</div>
       <div class="field">
-        <label>Nombre del Mercado / Proveedor <span class="req">*</span></label>
-        <input type="text" id="proveedor" placeholder="Ej: Mercado Central, Verdulería Juan, etc.">
+        <label>Nombre del Proveedor <span class="req">*</span></label>
+        <input type="text" id="proveedor" placeholder="Razón social o nombre comercial">
       </div>
       <div class="field">
-        <label>NIT / CUIT (si tiene)</label>
-        <input type="text" id="cuit" placeholder="Opcional">
+        <label>NIT / CUIT del Proveedor</label>
+        <input type="text" id="cuit" placeholder="Ej: 30-12345678-9">
+      </div>
+      <div class="field">
+        <label>Categoría General <span class="req">*</span></label>
+        <select id="categoriaGeneral">
+          <option value="">— Seleccioná una categoría —</option>
+          <optgroup label="Materias Primas">
+            <option>Materias Primas - Verduras/Frutas</option>
+            <option>Materias Primas - Lácteos/Huevos</option>
+            <option>Materias Primas - Abarrotes/Condimentos/Salsas</option>
+            <option>Materias Primas - Quesos</option>
+            <option>Materias Primas - Carnes</option>
+            <option>Materias Primas - Embutidos</option>
+            <option>Materias Primas - Harinas/Panes</option>
+          </optgroup>
+          <optgroup label="Otros Gastos">
+            <option>Artículos de Limpieza</option>
+            <option>Descartables</option>
+            <option>Material de Escritorio</option>
+            <option>Servicios Básicos</option>
+            <option>Alquileres</option>
+            <option>Mantenimientos</option>
+            <option>Reposición de Materiales</option>
+            <option>Reinversión</option>
+            <option>Sueldos y Salarios</option>
+            <option>Gastos Gerenciales</option>
+            <option>Impuestos y Patentes</option>
+            <option>Otros Servicios</option>
+            <option>Transporte</option>
+            <option>Marketing</option>
+            <option>Gastos Administrativos</option>
+            <option>Bebidas con Alcohol</option>
+            <option>Bebidas sin Alcohol</option>
+            <option>Otros Gastos</option>
+          </optgroup>
+        </select>
       </div>
     </div>
 
     <!-- Productos -->
     <div class="section">
-      <div class="section-title">🛒 Productos Comprados</div>
+      <div class="section-title">📦 Productos</div>
       <div class="productos-container" id="productosContainer"></div>
-      <button type="button" class="btn-add-prod" onclick="agregarProducto()">
+      <button type="button" class="btn-add-prod" onclick="agregarProducto()" style="margin-top:12px;">
         ＋ Agregar producto
       </button>
     </div>
 
+    <!-- Descuento global -->
+    <div class="desc-global-box">
+      <div class="desc-global-title">🏷️ Descuento sobre el total de la factura (opcional)</div>
+      <div class="desc-tipo-group">
+        <button type="button" class="desc-tipo-btn" id="descPctBtn" onclick="setDescGlobal('pct')">% Porcentaje</button>
+        <button type="button" class="desc-tipo-btn" id="descMontoBtn" onclick="setDescGlobal('monto')">$ Monto fijo</button>
+      </div>
+      <div id="descGlobalInput" style="display:none;">
+        <div class="prod-field">
+          <label id="descGlobalLabel">Descuento (%)</label>
+          <input type="number" id="descGlobalVal" placeholder="0" min="0" step="any" oninput="recalcularTodo()">
+        </div>
+      </div>
+    </div>
+
     <!-- Resumen -->
     <div class="resumen-box">
-      <div class="resumen-row"><span class="key">Cantidad de productos</span><span class="val" id="resCantidad">0</span></div>
-      <div class="resumen-row"><span class="key" style="font-weight:700; font-size:15px;">TOTAL COMPRA</span><span class="val" id="resTotalTexto" style="font-size:17px; color:var(--verde);">$0,00</span></div>
+      <div class="resumen-row"><span class="key">Subtotal productos</span><span class="val" id="resSubtotal">$0,00</span></div>
+      <div class="resumen-row" id="resDescRow" style="display:none;"><span class="key">Descuento</span><span class="val" id="resDesc" style="color:var(--rojo);">-$0,00</span></div>
+      <div class="resumen-row"><span class="key" style="font-weight:700; font-size:15px;">TOTAL A PAGAR</span><span class="val" id="resTotalTexto" style="font-size:17px; color:var(--azul);">$0,00</span></div>
     </div>
 
     <div class="total-box">
       <div>
-        <div class="label">Total de la Compra</div>
-        <div style="font-size:11px; color:rgba(255,255,255,0.6); margin-top:2px;">Suma de todos los productos</div>
+        <div class="label">Total Confirmado</div>
+        <div style="font-size:11px; color:rgba(255,255,255,0.6); margin-top:2px;">Incluye descuentos aplicados</div>
       </div>
       <div class="monto"><span>$</span><span id="totalMonto">0,00</span></div>
     </div>
 
-    <button class="btn-enviar" onclick="enviarCompra()">🛒 Registrar Compra</button>
+    <button class="btn-enviar" onclick="enviarSolicitud()">📤 Enviar Solicitud de Pago</button>
 
   </div>
 
   <!-- Éxito -->
   <div class="success-screen" id="successScreen">
     <div class="success-icon">✅</div>
-    <h2>¡Compra Registrada!</h2>
-    <p>Los productos fueron guardados correctamente.</p>
-    <p style="font-size:12px;color:#aaa;">Los datos alimentan el control de fluctuación de precios automáticamente.</p>
-    <div class="success-detail" id="successDetail"></div>
-    <button class="btn-nueva" onclick="nuevaCompra()">+ Nueva Compra</button>
+    <h2>¡Solicitud Enviada!</h2>
+    <p>Tu solicitud fue registrada correctamente.</p>
+    <p style="font-size:12px;color:#aaa;">El encargado recibirá la solicitud y procesará el pago.</p>
+    <div id="successResumen" style="background:var(--verde-c);border-radius:14px;padding:16px;margin:16px 0;text-align:left;font-size:13px;"></div>
+    <button class="btn-nueva" onclick="nuevaSolicitud()">+ Nueva Solicitud</button>
   </div>
 
 </div>
@@ -253,14 +358,12 @@
 <script>
 // ── Config ──────────────────────────────────────────────────
 window.addEventListener('load', () => {
-  const url = localStorage.getItem('mercado_sheetsUrl');
+  const url = localStorage.getItem('sol_sheetsUrl');
   if (url) { document.getElementById('sheetsUrl').value = url; document.getElementById('configUrl').style.display='none'; }
   document.getElementById('sheetsUrl').addEventListener('change', e => {
-    if (e.target.value) { localStorage.setItem('mercado_sheetsUrl', e.target.value); document.getElementById('configUrl').style.display='none'; }
+    if (e.target.value) { localStorage.setItem('sol_sheetsUrl', e.target.value); document.getElementById('configUrl').style.display='none'; }
   });
-  // Fecha de hoy por defecto
-  document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
-  agregarProducto();
+  agregarProducto(); // primer producto por defecto
 });
 
 // ── Tipo comprobante ────────────────────────────────────────
@@ -272,6 +375,18 @@ function setTipo(t) {
   document.getElementById('btnSF').className = 'toggle-btn' + (t==='S/F'?' active-sf':'');
   document.getElementById('facturaField').className = 'factura-field' + (t==='C/F'?' visible':'');
   if (t==='S/F') document.getElementById('nfactura').value='';
+}
+
+// ── Descuento global ────────────────────────────────────────
+var descGlobalTipo = '';
+function setDescGlobal(tipo) {
+  descGlobalTipo = tipo;
+  document.getElementById('descPctBtn').className = 'desc-tipo-btn' + (tipo==='pct'?' active':'');
+  document.getElementById('descMontoBtn').className = 'desc-tipo-btn' + (tipo==='monto'?' active':'');
+  document.getElementById('descGlobalInput').style.display = 'block';
+  document.getElementById('descGlobalLabel').textContent = tipo==='pct' ? 'Descuento (%)' : 'Descuento ($)';
+  document.getElementById('descGlobalVal').value = '';
+  recalcularTodo();
 }
 
 // ── Productos dinámicos ─────────────────────────────────────
@@ -308,6 +423,7 @@ function agregarProducto() {
   prodCount++;
   var id = prodCount;
   var cont = document.getElementById('productosContainer');
+
   var catOptions = CATS.map(function(c){ return '<option>'+c+'</option>'; }).join('');
 
   var card = document.createElement('div');
@@ -318,13 +434,14 @@ function agregarProducto() {
       <span class="producto-num">Producto #${id}</span>
       ${id > 1 ? '<button class="btn-remove-prod" onclick="eliminarProducto('+id+')">✕</button>' : '<span></span>'}
     </div>
+
     <div class="prod-grid">
       <div class="prod-field full">
         <label>Nombre del Producto <span class="req">*</span></label>
-        <input type="text" id="pnombre_${id}" placeholder="Ej: Tomate perita, Leche entera..." oninput="recalcularTodo()">
+        <input type="text" id="pnombre_${id}" placeholder="Descripción del producto" oninput="recalcularTodo()">
       </div>
       <div class="prod-field">
-        <label>Categoría <span class="req">*</span></label>
+        <label>Categoría</label>
         <select id="pcat_${id}">
           <option value="">— Categoría —</option>
           ${catOptions}
@@ -352,6 +469,7 @@ function agregarProducto() {
         </select>
       </div>
     </div>
+
     <div class="prod-grid-3">
       <div class="prod-field">
         <label>Cantidad <span class="req">*</span></label>
@@ -362,17 +480,18 @@ function agregarProducto() {
         <input type="number" id="pprecio_${id}" placeholder="0.00" min="0" step="0.01" oninput="calcSubtotal(${id})">
       </div>
       <div class="prod-field">
-        <label>Desc. ($)</label>
+        <label>Desc. producto ($)</label>
         <input type="number" id="pdesc_${id}" placeholder="0.00" min="0" step="0.01" oninput="calcSubtotal(${id})">
       </div>
     </div>
+
     <div class="subtotal-prod">
       <span class="label">Subtotal</span>
       <span class="valor" id="psubtotal_${id}">$0,00</span>
     </div>
   `;
   cont.appendChild(card);
-  card.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function eliminarProducto(id) {
@@ -384,39 +503,59 @@ function calcSubtotal(id) {
   var cant   = parseFloat(document.getElementById('pcant_'+id).value)   || 0;
   var precio = parseFloat(document.getElementById('pprecio_'+id).value) || 0;
   var desc   = parseFloat(document.getElementById('pdesc_'+id).value)   || 0;
-  var sub    = Math.max(0, cant * precio - desc);
-  document.getElementById('psubtotal_'+id).textContent = '$' + sub.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  var sub    = cant * precio;
+  var descMonto = desc;
+  var total  = sub - descMonto;
+  document.getElementById('psubtotal_'+id).textContent = '$' + total.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
   recalcularTodo();
-  return sub;
+  return total;
 }
 
 function recalcularTodo() {
   var cards = document.querySelectorAll('.producto-card');
-  var total = 0;
-  var cant  = 0;
+  var subtotal = 0;
   cards.forEach(function(card) {
-    var id     = card.id.replace('prod_','');
-    var c      = parseFloat(document.getElementById('pcant_'+id) && document.getElementById('pcant_'+id).value) || 0;
-    var p      = parseFloat(document.getElementById('pprecio_'+id) && document.getElementById('pprecio_'+id).value) || 0;
-    var d      = parseFloat(document.getElementById('pdesc_'+id) && document.getElementById('pdesc_'+id).value) || 0;
-    var sub    = Math.max(0, c * p - d);
-    total += sub;
+    var id = card.id.replace('prod_','');
+    var cant   = parseFloat(document.getElementById('pcant_'+id)  && document.getElementById('pcant_'+id).value)   || 0;
+    var precio = parseFloat(document.getElementById('pprecio_'+id)&& document.getElementById('pprecio_'+id).value) || 0;
+    var desc   = parseFloat(document.getElementById('pdesc_'+id)  && document.getElementById('pdesc_'+id).value)   || 0;
+    var sub = Math.max(0, cant * precio - desc);
+    subtotal += sub;
     if (document.getElementById('psubtotal_'+id)) {
       document.getElementById('psubtotal_'+id).textContent = '$'+sub.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
     }
-    if (document.getElementById('pnombre_'+id) && document.getElementById('pnombre_'+id).value.trim()) cant++;
   });
-  document.getElementById('resCantidad').textContent = cant;
+
+  // Descuento global
+  var descGlobal = 0;
+  var descVal = parseFloat(document.getElementById('descGlobalVal').value) || 0;
+  if (descGlobalTipo === 'pct')   descGlobal = subtotal * (descVal/100);
+  if (descGlobalTipo === 'monto') descGlobal = descVal;
+
+  var total = Math.max(0, subtotal - descGlobal);
+
+  // Actualizar resumen
+  document.getElementById('resSubtotal').textContent = '$'+subtotal.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  if (descGlobal > 0) {
+    document.getElementById('resDescRow').style.display = 'flex';
+    document.getElementById('resDesc').textContent = '-$'+descGlobal.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  } else {
+    document.getElementById('resDescRow').style.display = 'none';
+  }
+
   document.getElementById('resTotalTexto').textContent = '$'+total.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
   document.getElementById('totalMonto').textContent = total.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  return total;
+
+  return { subtotal, descGlobal, total };
 }
 
+// ── Recolectar productos ────────────────────────────────────
 function recolectarProductos() {
   var cards = document.querySelectorAll('.producto-card');
   var productos = [];
   cards.forEach(function(card) {
-    var id     = card.id.replace('prod_','');
+    var id = card.id.replace('prod_','');
     var nombre = document.getElementById('pnombre_'+id).value.trim();
     if (!nombre) return;
     var cant   = parseFloat(document.getElementById('pcant_'+id).value)   || 0;
@@ -424,24 +563,26 @@ function recolectarProductos() {
     var desc   = parseFloat(document.getElementById('pdesc_'+id).value)   || 0;
     var cat    = document.getElementById('pcat_'+id).value;
     var unidad = document.getElementById('punidad_'+id).value;
-    var sub    = Math.max(0, cant * precio - desc);
-    productos.push({ nombre, categoria:cat, unidad, cantidad:cant, precio_unit:precio, desc_monto:desc, subtotal:sub });
+    var sub    = cant * precio;
+    var descMonto = desc;
+    var subtotal = sub - descMonto;
+    productos.push({ nombre, categoria: cat, unidad, cantidad: cant, precio_unit: precio, desc_pct: desc, desc_monto: descMonto, subtotal });
   });
   return productos;
 }
 
 // ── Validar ─────────────────────────────────────────────────
 function validar() {
-  if (!document.getElementById('fecha').value)           { showToast('⚠️ Ingresá la fecha de compra'); return false; }
-  if (!document.getElementById('solicitante').value.trim()){ showToast('⚠️ Ingresá el nombre del solicitante'); return false; }
-  if (!document.getElementById('local').value)           { showToast('⚠️ Seleccioná el local'); return false; }
-  if (!tipoSeleccionado)                                  { showToast('⚠️ Seleccioná el tipo de comprobante'); return false; }
-  if (!document.getElementById('proveedor').value.trim()){ showToast('⚠️ Ingresá el nombre del mercado/proveedor'); return false; }
+  if (!document.getElementById('local').value) { showToast('⚠️ Seleccioná el local'); return false; }
+  if (!tipoSeleccionado) { showToast('⚠️ Seleccioná el tipo de comprobante'); return false; }
+  if (tipoSeleccionado==='C/F' && !document.getElementById('nfactura').value.trim()) { showToast('⚠️ Ingresá el número de factura'); return false; }
+  if (!document.getElementById('proveedor').value.trim()) { showToast('⚠️ Ingresá el nombre del proveedor'); return false; }
+  if (!document.getElementById('categoriaGeneral').value) { showToast('⚠️ Seleccioná una categoría'); return false; }
+
   var prods = recolectarProductos();
   if (prods.length === 0) { showToast('⚠️ Ingresá al menos un producto'); return false; }
   for (var i=0; i<prods.length; i++) {
-    if (!prods[i].categoria) { showToast('⚠️ Seleccioná la categoría del producto #'+(i+1)); return false; }
-    if (!prods[i].unidad)    { showToast('⚠️ Seleccioná la unidad del producto #'+(i+1)); return false; }
+    if (!prods[i].unidad) { showToast('⚠️ Seleccioná la unidad del producto #'+(i+1)); return false; }
     if (prods[i].cantidad <= 0) { showToast('⚠️ Ingresá la cantidad del producto #'+(i+1)); return false; }
     if (prods[i].precio_unit <= 0) { showToast('⚠️ Ingresá el precio del producto #'+(i+1)); return false; }
   }
@@ -449,38 +590,38 @@ function validar() {
 }
 
 // ── Enviar ──────────────────────────────────────────────────
-async function enviarCompra() {
+async function enviarSolicitud() {
   if (!validar()) return;
 
-  var sheetsUrl = localStorage.getItem('mercado_sheetsUrl') || document.getElementById('sheetsUrl').value.trim();
+  var sheetsUrl = localStorage.getItem('sol_sheetsUrl') || document.getElementById('sheetsUrl').value.trim();
   if (!sheetsUrl) { document.getElementById('configUrl').style.display='block'; showToast('⚠️ Ingresá la URL del Web App'); return; }
 
-  var total    = recalcularTodo();
+  var totales = recalcularTodo();
   var productos = recolectarProductos();
 
-  // Formatear fecha de YYYY-MM-DD a DD/MM/YYYY
-  var fechaRaw = document.getElementById('fecha').value;
-  var partes   = fechaRaw.split('-');
-  var fecha    = partes[2]+'/'+partes[1]+'/'+partes[0];
-
   var payload = {
-    action:    'comprasMercado',
-    fecha,
-    solicitante: document.getElementById('solicitante').value.trim(),
-    local:     document.getElementById('local').value,
-    tipo:      tipoSeleccionado,
-    nfactura:  document.getElementById('nfactura').value.trim(),
-    proveedor: document.getElementById('proveedor').value.trim(),
-    cuit:      document.getElementById('cuit').value.trim(),
-    productos,
-    total
+    action:         'solicitudPago',
+    fecha:          hoy(),
+    solicitante:    document.getElementById('solicitante').value.trim(),
+    local:          document.getElementById('local').value,
+    tipo:           tipoSeleccionado,
+    nfactura:       document.getElementById('nfactura').value.trim(),
+    proveedor:      document.getElementById('proveedor').value.trim(),
+    cuit:           document.getElementById('cuit').value.trim(),
+    categoria:      document.getElementById('categoriaGeneral').value,
+    productos:      productos,
+    subtotal:       totales.subtotal,
+    desc_global:    totales.descGlobal,
+    desc_global_tipo: descGlobalTipo,
+    desc_global_val: parseFloat(document.getElementById('descGlobalVal').value)||0,
+    total:          totales.total,
+    estado:         'Pendiente'
   };
 
   document.getElementById('loadingOverlay').classList.add('show');
 
   try {
-    var jsonStr = JSON.stringify(payload);
-    await fetch(sheetsUrl + '?data=' + encodeURIComponent(jsonStr), { method:'GET', mode:'no-cors' });
+    var jsonStr = JSON.stringify(payload); await fetch(sheetsUrl + "?data=" + encodeURIComponent(jsonStr), { method:"GET", mode:"no-cors" });
     document.getElementById('loadingOverlay').classList.remove('show');
     mostrarExito(payload);
   } catch(err) {
@@ -495,27 +636,32 @@ function mostrarExito(d) {
   document.getElementById('successScreen').style.display='block';
 
   var prodsHtml = d.productos.map(function(p,i){
-    return '<div style="padding:5px 0; border-bottom:1px solid rgba(55,86,35,0.1);">'+
-      '<b>'+(i+1)+'. '+p.nombre+'</b><br>'+
-      '<span style="color:#555;font-size:12px;">'+p.cantidad+' '+p.unidad+' × $'+p.precio_unit.toLocaleString('es-AR')+
-      (p.desc_monto>0?' — Desc: $'+p.desc_monto.toLocaleString('es-AR'):'')+
-      ' = <b>$'+p.subtotal.toLocaleString('es-AR',{minimumFractionDigits:2})+'</b></span></div>';
+    return '<div style="padding:6px 0; border-bottom:1px solid rgba(55,86,35,0.1);">'+
+      '<b>'+(i+1)+'. '+p.nombre+'</b> — '+p.cantidad+' '+p.unidad+' × $'+p.precio_unit.toLocaleString('es-AR')+
+      (p.desc_pct>0?' <span style="color:var(--rojo);">(-'+p.desc_pct+'%)</span>':'')+
+      ' = <b>$'+p.subtotal.toLocaleString('es-AR',{minimumFractionDigits:2})+'</b></div>';
   }).join('');
 
-  document.getElementById('successDetail').innerHTML =
-    '<b style="color:var(--verde);">'+d.proveedor+'</b> · '+d.local+' · '+d.fecha+'<br><br>'+
-    prodsHtml+
-    '<div style="padding:8px 0;font-size:16px;font-weight:700;color:var(--verde);">Total: $'+d.total.toLocaleString('es-AR',{minimumFractionDigits:2})+'</div>';
+  document.getElementById('successResumen').innerHTML =
+    '<b style="color:var(--verde);">'+d.proveedor+'</b> · '+d.local+'<br><br>'+
+    prodsHtml +
+    (d.desc_global>0?'<div style="padding:6px 0;color:var(--rojo);">Descuento factura: -$'+d.desc_global.toLocaleString('es-AR',{minimumFractionDigits:2})+'</div>':'')+
+    '<div style="padding:8px 0;font-size:16px;font-weight:700;color:var(--azul);">Total: $'+d.total.toLocaleString('es-AR',{minimumFractionDigits:2})+'</div>'+
+    '<div style="font-size:12px;color:#888;">Estado: 🕐 Pendiente de aprobación</div>';
 }
 
-function nuevaCompra() {
+function nuevaSolicitud() {
   document.getElementById('successScreen').style.display='none';
   document.getElementById('formContainer').style.display='block';
   document.getElementById('productosContainer').innerHTML='';
   prodCount=0;
   ['solicitante','proveedor','cuit','nfactura'].forEach(function(id){ document.getElementById(id).value=''; });
-  document.getElementById('local').selectedIndex=0;
-  document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+  ['local','categoriaGeneral'].forEach(function(id){ document.getElementById(id).selectedIndex=0; });
+  document.getElementById('descGlobalVal').value='';
+  document.getElementById('descGlobalInput').style.display='none';
+  descGlobalTipo='';
+  document.getElementById('descPctBtn').className='desc-tipo-btn';
+  document.getElementById('descMontoBtn').className='desc-tipo-btn';
   tipoSeleccionado='';
   document.getElementById('btnCF').className='toggle-btn';
   document.getElementById('btnSF').className='toggle-btn';
@@ -523,6 +669,11 @@ function nuevaCompra() {
   recalcularTodo();
   agregarProducto();
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function hoy() {
+  var d=new Date();
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
 }
 
 function showToast(msg) {
