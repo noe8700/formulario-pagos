@@ -232,6 +232,11 @@
         </select>
       </div>
       <div class="field">
+        <label>Solicitante <span class="req">*</span></label>
+        <input type="text" id="solicitante" placeholder="Nombre completo de quien realiza la solicitud">
+      </div>
+
+      <div class="field">
         <label>Tipo de Comprobante <span class="req">*</span></label>
         <div class="toggle-group">
           <button type="button" class="toggle-btn" id="btnCF" onclick="setTipo('C/F')">✅ C/F — Con Factura</button>
@@ -287,6 +292,8 @@
             <option>Transporte</option>
             <option>Marketing</option>
             <option>Gastos Administrativos</option>
+            <option>Bebidas con Alcohol</option>
+            <option>Bebidas sin Alcohol</option>
             <option>Otros Gastos</option>
           </optgroup>
         </select>
@@ -385,13 +392,31 @@ function setDescGlobal(tipo) {
 // ── Productos dinámicos ─────────────────────────────────────
 var prodCount = 0;
 var CATS = [
-  "Materias Primas - Verduras/Frutas","Materias Primas - Lácteos/Huevos",
-  "Materias Primas - Abarrotes/Condimentos/Salsas","Materias Primas - Quesos",
-  "Materias Primas - Carnes","Materias Primas - Embutidos","Materias Primas - Harinas/Panes",
-  "Artículos de Limpieza","Descartables","Material de Escritorio","Servicios Básicos",
-  "Alquileres","Mantenimientos","Reposición de Materiales","Reinversión",
-  "Sueldos y Salarios","Gastos Gerenciales","Impuestos y Patentes",
-  "Otros Servicios","Transporte","Marketing","Gastos Administrativos","Otros Gastos"
+  "Materias Primas - Verduras/Frutas",
+  "Materias Primas - Lácteos/Huevos",
+  "Materias Primas - Abarrotes/Condimentos/Salsas",
+  "Materias Primas - Quesos",
+  "Materias Primas - Carnes",
+  "Materias Primas - Embutidos",
+  "Materias Primas - Harinas/Panes",
+  "Artículos de Limpieza",
+  "Descartables",
+  "Material de Escritorio",
+  "Servicios Básicos",
+  "Alquileres",
+  "Mantenimientos",
+  "Reposición de Materiales",
+  "Reinversión",
+  "Sueldos y Salarios",
+  "Gastos Gerenciales",
+  "Impuestos y Patentes",
+  "Otros Servicios",
+  "Transporte",
+  "Marketing",
+  "Gastos Administrativos",
+  "Bebidas con Alcohol",
+  "Bebidas sin Alcohol",
+  "Otros Gastos"
 ];
 
 function agregarProducto() {
@@ -426,9 +451,21 @@ function agregarProducto() {
         <label>Unidad <span class="req">*</span></label>
         <select id="punidad_${id}">
           <option value="">—</option>
-          <option>kg</option><option>lts</option><option>und</option>
-          <option>paq</option><option>caja</option><option>docena</option>
-          <option>metros</option><option>horas</option><option>otro</option>
+          <option>kg</option>
+          <option>lts</option>
+          <option>und</option>
+          <option>paq</option>
+          <option>caja</option>
+          <option>docena</option>
+          <option>metros</option>
+          <option>libras</option>
+          <option>@</option>
+          <option>amarro</option>
+          <option>canasta</option>
+          <option>bolsa 250grm</option>
+          <option>bidón 5lts</option>
+          <option>horas</option>
+          <option>otro</option>
         </select>
       </div>
     </div>
@@ -565,6 +602,7 @@ async function enviarSolicitud() {
   var payload = {
     action:         'solicitudPago',
     fecha:          hoy(),
+    solicitante:    document.getElementById('solicitante').value.trim(),
     local:          document.getElementById('local').value,
     tipo:           tipoSeleccionado,
     nfactura:       document.getElementById('nfactura').value.trim(),
@@ -617,7 +655,7 @@ function nuevaSolicitud() {
   document.getElementById('formContainer').style.display='block';
   document.getElementById('productosContainer').innerHTML='';
   prodCount=0;
-  ['proveedor','cuit','nfactura'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['solicitante','proveedor','cuit','nfactura'].forEach(function(id){ document.getElementById(id).value=''; });
   ['local','categoriaGeneral'].forEach(function(id){ document.getElementById(id).selectedIndex=0; });
   document.getElementById('descGlobalVal').value='';
   document.getElementById('descGlobalInput').style.display='none';
