@@ -624,7 +624,9 @@ async function enviarSolicitud() {
   document.getElementById('loadingOverlay').classList.add('show');
 
   try {
-    var jsonStr = JSON.stringify(payload); await fetch(sheetsUrl + "?data=" + encodeURIComponent(jsonStr), { method:"GET", mode:"no-cors" });
+    var formData = new FormData();
+formData.append('data', JSON.stringify(payload));
+await fetch(sheetsUrl, { method:"POST", mode:"no-cors", body: formData });
     document.getElementById('loadingOverlay').classList.remove('show');
     mostrarExito(payload);
   } catch(err) {
