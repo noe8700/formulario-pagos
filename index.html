@@ -604,7 +604,8 @@ async function enviarSolicitud() {
 
   var payload = {
     action:         'solicitudPago',
-    fecha:          hoy(),
+    fecha:          document.getElementById('fechaDoc') && document.getElementById('fechaDoc').value ? (function(f){var p=f.split('-');return p[2]+'/'+p[1]+'/'+p[0];})(document.getElementById('fechaDoc').value) : hoy(),
+    fecha_carga:    hoy(),
     solicitante:    document.getElementById('solicitante').value.trim(),
     local:          document.getElementById('local').value,
     tipo:           tipoSeleccionado,
@@ -673,7 +674,10 @@ function nuevaSolicitud() {
   agregarProducto();
   window.scrollTo({top:0,behavior:'smooth'});
 }
-
+function formatFecha(f) {
+  var p = f.split('-');
+  return p[2]+'/'+p[1]+'/'+p[0];
+}
 function hoy() {
   var d=new Date();
   return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
