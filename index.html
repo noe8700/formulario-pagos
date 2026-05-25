@@ -246,7 +246,7 @@
       </div>
       <div class="factura-field" id="facturaField">
         <div class="field" style="margin-bottom:0;">
-          <label>N° de Factura <span class="req">*</span></label>
+          <label>N° de Factura / Recibo</label>
           <input type="text" id="nfactura" placeholder="Ej: 0001-00012345">
         </div>
       </div>
@@ -373,8 +373,7 @@ function setTipo(t) {
   document.getElementById('tipoComp').value = t;
   document.getElementById('btnCF').className = 'toggle-btn' + (t==='C/F'?' active-cf':'');
   document.getElementById('btnSF').className = 'toggle-btn' + (t==='S/F'?' active-sf':'');
-  document.getElementById('facturaField').className = 'factura-field' + (t==='C/F'?' visible':'');
-  if (t==='S/F') document.getElementById('nfactura').value='';
+  document.getElementById('facturaField').className = 'factura-field visible';
 }
 
 // ── Descuento global ────────────────────────────────────────
