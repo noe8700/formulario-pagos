@@ -605,7 +605,6 @@ async function enviarSolicitud() {
   var payload = {
     action:         'solicitudPago',
     fecha:          document.getElementById('fechaDoc') && document.getElementById('fechaDoc').value ? (function(f){var p=f.split('-');return p[2]+'/'+p[1]+'/'+p[0];})(document.getElementById('fechaDoc').value) : hoy(),
-    fecha_carga:    hoy(),
     solicitante:    document.getElementById('solicitante').value.trim(),
     local:          document.getElementById('local').value,
     tipo:           tipoSeleccionado,
